@@ -22,7 +22,7 @@ from time import time, sleep
 
 # carName = input('search for the cars:')
 siteCarsUrl = 'https://bama.ir/car'
-carName = 'پراید'
+carName = 'اپل'
 
 def createChromeDriver():
     options = webdriver.ChromeOptions()
@@ -46,6 +46,7 @@ try:
     car_check_box_container = WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="brand-multi-selection-list"]/div[2]')))
     all_options = car_check_box_container.find_elements(By.CLASS_NAME, "ms-item")
 
+    # cars = []
     # ? find the car
     for option in all_options:
         carBrand = option.find_element(By.CLASS_NAME, "title").text
@@ -55,15 +56,10 @@ try:
             checkbox.click()
 
             WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'apply'))).click()
+            sleep(2)
 
-
-
-
-            print(WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'bama-ad-item'))))
-
-            match = False
             total_page = 1
-            while match==False:
+            while True:
                 print('loading page ' + str(total_page))
                 lenOfPage = driver.execute_script("window.scrollTo(0, document.body.scrollHeight);var lenOfPage=document.body.scrollHeight;return lenOfPage;")
                 
@@ -71,9 +67,11 @@ try:
 
                 lastCount = lenOfPage
                 lenOfPage = driver.execute_script("window.scrollTo(0, document.body.scrollHeight);var lenOfPage=document.body.scrollHeight;return lenOfPage;")
-                total_page+=1
                 if lastCount == lenOfPage:
-                    match=True
+                    break
+                else:
+                    total_page+=1
+
 
             
 
@@ -82,6 +80,34 @@ try:
 
             
             break
+
+    cars = driver.find_elements(By.CLASS_NAME, 'bama-ad-link')
+    print('total car count is: '+ str(len(cars)))
+
+    for car in cars:
+        # print(WebDriverWait(car, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'bama-ad-title'))).text)
+        # print(WebDriverWait(car, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'bama-ad-time'))).text)
+        # print(WebDriverWait(car, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'bama-ad-subtitle'))).text)
+        # print(WebDriverWait(car, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'bama-ad-locmil'))).text)
+        # print(WebDriverWait(car, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'price-text'))).text)
+
+        
+        try:
+            print(car.find_element(By.CLASS_NAME, 'bama-ad-title').text)
+            print(car.find_element(By.CLASS_NAME, 'bama-ad-time').text)
+            print(car.find_element(By.CLASS_NAME, 'bama-ad-subtitle').text)
+            print(car.find_element(By.CLASS_NAME, 'bama-ad-locmil').text)
+            print(car.find_element(By.CLASS_NAME, 'price-text').text)
+        except:
+            print('err occure in parsing car')
+
+    # courseResponse = requests.get(siteCarsUrl + '/' + carEnglishName)
+    # courseHtml = BeautifulSoup(courseResponse.text, 'html.parser')
+    # print(courseHtml.find_all(class_='bama-ad-link'))
+
+    # f = open("demofile2.txt", "a")
+    # f.write(courseHtml.prettify())
+    # f.close()
     driver.close()
 
     
