@@ -22,10 +22,15 @@ from time import time, sleep
 # ? import car class
 from classes.car_class import car_class
 
+# ? import excel class
+from classes.excel_class import excel_class
+
 
 # carName = input('search for the cars:')
 siteCarsUrl = 'https://bama.ir/car'
 carName = 'اپل'
+
+# excel = excel_class('bama_cars.xlsx', 'bama_car_list', env.coursePropTitleList)
 
 def createChromeDriver():
     options = webdriver.ChromeOptions()
@@ -88,12 +93,6 @@ try:
     print('total car count is: '+ str(len(cars)))
 
     for car in cars:
-        # print(WebDriverWait(car, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'bama-ad-title'))).text)
-        # print(WebDriverWait(car, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'bama-ad-time'))).text)
-        # print(WebDriverWait(car, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'bama-ad-subtitle'))).text)
-        # print(WebDriverWait(car, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'bama-ad-locmil'))).text)
-        # print(WebDriverWait(car, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'price-text'))).text)
-
         
         try:
             print(car.find_element(By.CLASS_NAME, 'bama-ad-title').text)
@@ -113,13 +112,6 @@ try:
         except:
             print('err occure in parsing car')
 
-    # courseResponse = requests.get(siteCarsUrl + '/' + carEnglishName)
-    # courseHtml = BeautifulSoup(courseResponse.text, 'html.parser')
-    # print(courseHtml.find_all(class_='bama-ad-link'))
-
-    # f = open("demofile2.txt", "a")
-    # f.write(courseHtml.prettify())
-    # f.close()
     driver.close()
 
     
