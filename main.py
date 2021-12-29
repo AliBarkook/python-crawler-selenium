@@ -19,6 +19,9 @@ from bs4 import BeautifulSoup
 # ? import time and speep module
 from time import time, sleep
 
+# ? import car class
+from classes.car_class import car_class
+
 
 # carName = input('search for the cars:')
 siteCarsUrl = 'https://bama.ir/car'
@@ -98,6 +101,15 @@ try:
             print(car.find_element(By.CLASS_NAME, 'bama-ad-subtitle').text)
             print(car.find_element(By.CLASS_NAME, 'bama-ad-locmil').text)
             print(car.find_element(By.CLASS_NAME, 'price-text').text)
+
+            title = car.find_element(By.CLASS_NAME, 'bama-ad-title').text
+            time = car.find_element(By.CLASS_NAME, 'bama-ad-time').text
+            function = car.find_element(By.CLASS_NAME, 'bama-ad-subtitle').text
+            address = car.find_element(By.CLASS_NAME, 'bama-ad-locmil').text
+            price = car.find_element(By.CLASS_NAME, 'price-text').text
+
+            # ? create instanse from car class
+            car = car_class(title, time, function, address, price)
         except:
             print('err occure in parsing car')
 
