@@ -24,11 +24,11 @@ class excel_class:
 
     """
     # ? -> 1
-    def __init__(self, excelName, sheetName, coursePropTitleList):
+    def __init__(self, excelName, sheetName):
 
         self.excelName = excelName
         self.sheetName = sheetName
-        self.coursePropTitleList = coursePropTitleList
+        self.coursePropTitleList = ['نام ماشین', 'زمان', 'کارکرد', 'آدرس', 'قیمت', 'لینک']
 
         self.excelFile = xlsxwriter.Workbook(excelName)
         self.worksheet = self.excelFile.add_worksheet(sheetName)
@@ -53,11 +53,11 @@ class excel_class:
                 if decision != 'n':
                     continue
     # ? -> 4
-    def storeDataInExcel(self, row, col, course):
+    def storeDataInExcel(self, row, col, car):
         try:
-            worksheet = self.excelFile.get_worksheet_by_name(self.sheetName)
-            for prop in course.getCourseList():
-                worksheet.write(row, col, prop)
+            # worksheet = self.excelFile.get_worksheet_by_name(self.sheetName)
+            for prop in car.getPropertyList():
+                self.worksheet.write(row, col, prop)
                 col += 1
         except:
-            print('can not write to excel file course number' + str(row))
+            print('can not write to excel file course number ' + str(row))

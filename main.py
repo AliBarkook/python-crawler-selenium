@@ -11,7 +11,7 @@ from selenium.webdriver.support import expected_conditions as EC
 # from seleniumwire import webdriver
 
 # ? improt request module for http request
-import requests
+# import requests
 
 # ? import Beautiful soup module for pars html
 from bs4 import BeautifulSoup
@@ -28,9 +28,12 @@ from classes.excel_class import excel_class
 
 # carName = input('search for the cars:')
 siteCarsUrl = 'https://bama.ir/car'
-carName = 'اپل'
+carName = 'پراید'
 
-# excel = excel_class('bama_cars.xlsx', 'bama_car_list', env.coursePropTitleList)
+excel = excel_class('bama_cars.xlsx', 'bama_car_list')
+
+# ? create excel file and worksheet
+excel.initExcel()
 
 def createChromeDriver():
     options = webdriver.ChromeOptions()
@@ -54,7 +57,6 @@ try:
     car_check_box_container = WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="brand-multi-selection-list"]/div[2]')))
     all_options = car_check_box_container.find_elements(By.CLASS_NAME, "ms-item")
 
-    # cars = []
     # ? find the car
     for option in all_options:
         carBrand = option.find_element(By.CLASS_NAME, "title").text
@@ -71,7 +73,7 @@ try:
                 print('loading page ' + str(total_page))
                 lenOfPage = driver.execute_script("window.scrollTo(0, document.body.scrollHeight);var lenOfPage=document.body.scrollHeight;return lenOfPage;")
                 
-                sleep(3)
+                sleep(5)
 
                 lastCount = lenOfPage
                 lenOfPage = driver.execute_script("window.scrollTo(0, document.body.scrollHeight);var lenOfPage=document.body.scrollHeight;return lenOfPage;")
@@ -92,31 +94,30 @@ try:
     cars = driver.find_elements(By.CLASS_NAME, 'bama-ad-link')
     print('total car count is: '+ str(len(cars)))
 
+    index = 1
     for car in cars:
         
         try:
-            print(car.find_element(By.CLASS_NAME, 'bama-ad-title').text)
-            print(car.find_element(By.CLASS_NAME, 'bama-ad-time').text)
-            print(car.find_element(By.CLASS_NAME, 'bama-ad-subtitle').text)
-            print(car.find_element(By.CLASS_NAME, 'bama-ad-locmil').text)
-            print(car.find_element(By.CLASS_NAME, 'price-text').text)
-
             title = car.find_element(By.CLASS_NAME, 'bama-ad-title').text
             time = car.find_element(By.CLASS_NAME, 'bama-ad-time').text
             function = car.find_element(By.CLASS_NAME, 'bama-ad-subtitle').text
             address = car.find_element(By.CLASS_NAME, 'bama-ad-locmil').text
             price = car.find_element(By.CLASS_NAME, 'price-text').text
+            carLink = car.get_attribute('href')
 
             # ? create instanse from car class
-            car = car_class(title, time, function, address, price)
+            car = car_class(title, time, function, address, price, carLink)
+            excel.storeDataInExcel(index, 0, car)
+            index = index + 1
         except:
             print('err occure in parsing car')
 
+    excel.closeExcel()
     driver.close()
 
     
 
 
-except ValueError:
-    print('error catched!', ValueError)
+except:
+    print('error catched!')
     
