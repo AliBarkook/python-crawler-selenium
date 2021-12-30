@@ -31,6 +31,7 @@ def createChromeDriver():
     options.add_argument("--disable-extensions")
     options.add_experimental_option('useAutomationExtension', False)
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    options.add_argument("--start-maximized")
     return webdriver.Chrome('chromedriver/chromedriver', options=options)
 
 # ? create driver and fix it`s bug
