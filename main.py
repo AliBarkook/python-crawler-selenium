@@ -8,10 +8,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-# from seleniumwire import webdriver
-
-# ? improt request module for http request
-# import requests
 
 # ? import Beautiful soup module for pars html
 from bs4 import BeautifulSoup
@@ -26,15 +22,13 @@ from classes.car_class import car_class
 from classes.excel_class import excel_class
 
 
-# carName = input('search for the cars:')
+carName = input('search for the cars:')
 siteCarsUrl = 'https://bama.ir/car'
-carName = 'پراید'
+# carName = 'اپل'
 
-excel = excel_class('bama_cars.xlsx', 'bama_car_list')
 
-# ? create excel file and worksheet
-excel.initExcel()
 
+# ? create and return chrome driver
 def createChromeDriver():
     options = webdriver.ChromeOptions()
     options.add_argument('--disable-blink-features=AutomationControlled')
@@ -43,81 +37,81 @@ def createChromeDriver():
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
     return webdriver.Chrome('chromedriver/chromedriver', options=options)
 
-try:
-    driver = createChromeDriver()
+driver = createChromeDriver()
+
+driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+
+
+driver.get(siteCarsUrl)
+
+
+WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.ID, "toggle-brand-selection"))).click()
+
+car_check_box_container = WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="brand-multi-selection-list"]/div[2]')))
+all_options = car_check_box_container.find_elements(By.CLASS_NAME, "ms-item")
+
+# ? find the car
+for option in all_options:
     
-    driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+    carBrand = option.find_element(By.CLASS_NAME, "title").text
+    if carName in carBrand:
+        carEnglishName = option.find_element(By.TAG_NAME, "input").get_attribute("value")
 
+        # ? create excel file and worksheet
+        excel = excel_class('excels/bama_cars_' + carEnglishName + '.xlsx', 'bama_car_list')
+        excel.initExcel()
 
-    driver.get(siteCarsUrl)
+        checkbox = option.find_element(By.TAG_NAME, "label")
+        checkbox.click()
 
+        WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'apply'))).click()
+        sleep(2)
 
-    WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.ID, "toggle-brand-selection"))).click()
-
-    car_check_box_container = WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="brand-multi-selection-list"]/div[2]')))
-    all_options = car_check_box_container.find_elements(By.CLASS_NAME, "ms-item")
-
-    # ? find the car
-    for option in all_options:
-        carBrand = option.find_element(By.CLASS_NAME, "title").text
-        if carName in carBrand:
-            carEnglishName = option.find_element(By.TAG_NAME, "input").get_attribute("value")
-            checkbox = option.find_element(By.TAG_NAME, "label")
-            checkbox.click()
-
-            WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'apply'))).click()
-            sleep(2)
-
-            total_page = 1
-            while True:
-                print('loading page ' + str(total_page))
-                lenOfPage = driver.execute_script("window.scrollTo(0, document.body.scrollHeight);var lenOfPage=document.body.scrollHeight;return lenOfPage;")
-                
-                sleep(5)
-
-                lastCount = lenOfPage
-                lenOfPage = driver.execute_script("window.scrollTo(0, document.body.scrollHeight);var lenOfPage=document.body.scrollHeight;return lenOfPage;")
-                if lastCount == lenOfPage:
-                    break
-                else:
-                    total_page+=1
-
-
+        total_page = 1
+        while True:
+            print('loading page ' + str(total_page))
+            lenOfPage = driver.execute_script("window.scrollTo(0, document.body.scrollHeight);var lenOfPage=document.body.scrollHeight;return lenOfPage;")
             
+            sleep(5)
 
-            print('total page is: ' + str(total_page))
+            lastCount = lenOfPage
+            lenOfPage = driver.execute_script("window.scrollTo(0, document.body.scrollHeight);var lenOfPage=document.body.scrollHeight;return lenOfPage;")
+            if lastCount == lenOfPage:
+                break
+            else:
+                total_page+=1
 
 
-            
-            break
-
-    cars = driver.find_elements(By.CLASS_NAME, 'bama-ad-link')
-    print('total car count is: '+ str(len(cars)))
-
-    index = 1
-    for car in cars:
         
-        try:
-            title = car.find_element(By.CLASS_NAME, 'bama-ad-title').text
-            time = car.find_element(By.CLASS_NAME, 'bama-ad-time').text
-            function = car.find_element(By.CLASS_NAME, 'bama-ad-subtitle').text
-            address = car.find_element(By.CLASS_NAME, 'bama-ad-locmil').text
-            price = car.find_element(By.CLASS_NAME, 'price-text').text
-            carLink = car.get_attribute('href')
 
-            # ? create instanse from car class
-            car = car_class(title, time, function, address, price, carLink)
-            excel.storeDataInExcel(index, 0, car)
-            index = index + 1
-        except:
-            print('err occure in parsing car')
+        print('total page is: ' + str(total_page))
 
-    excel.closeExcel()
-    driver.close()
 
+        
+        break
+
+# ? get car card element
+cars = driver.find_elements(By.CLASS_NAME, 'bama-ad-link')
+# print('total car count is: '+ str(len(cars)))
+
+print('createing excel file ...')
+index = 1
+for car in cars:
     
+    try:
+        title = car.find_element(By.CLASS_NAME, 'bama-ad-title').text
+        time = car.find_element(By.CLASS_NAME, 'bama-ad-time').text
+        function = car.find_element(By.CLASS_NAME, 'bama-ad-subtitle').text
+        address = car.find_element(By.CLASS_NAME, 'bama-ad-locmil').text
+        price = car.find_element(By.CLASS_NAME, 'bama-ad-price').text
+        carLink = car.get_attribute('href')
 
+        # ? create instanse from car class
+        car = car_class(title, time, function, address, price, carLink)
+        excel.storeDataInExcel(index, 0, car)
+        index = index + 1
+    except:
+        pass
 
-except:
-    print('error catched!')
-    
+excel.closeExcel()
+driver.close()
