@@ -18,7 +18,7 @@ class excel_class:
     |                                                                    |
     |   3 - close excel                                                  |
     |                                                                    |
-    |   4 - store course data in excel row                               |
+    |   4 - store cars data in excel row                                 |
     |                                                                    |
     ----------------------------------------------------------------------
 
@@ -28,17 +28,18 @@ class excel_class:
 
         self.excelName = excelName
         self.sheetName = sheetName
-        self.coursePropTitleList = ['نام ماشین', 'زمان', 'کارکرد', 'آدرس', 'قیمت', 'لینک']
+        self.carPropTitleList = ['نام ماشین', 'زمان', 'کارکرد', 'آدرس', 'قیمت', 'لینک']
 
         self.excelFile = xlsxwriter.Workbook(excelName)
         self.worksheet = self.excelFile.add_worksheet(sheetName)
+
     # ? -> 2
     def initExcel(self):
         col = 0
-        for title in self.coursePropTitleList:
-
+        for title in self.carPropTitleList:
             self.worksheet.write(0, col, title)
             col += 1
+
     # ? -> 3
     def closeExcel(self):
         while True:
@@ -52,6 +53,7 @@ class excel_class:
                                 "Try to write file again? [Y/n]: " % e)
                 if decision != 'n':
                     continue
+
     # ? -> 4
     def storeDataInExcel(self, row, col, car):
         try:
